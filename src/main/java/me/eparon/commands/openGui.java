@@ -6,12 +6,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 
 public class openGui {
-    public static Component open() {
+    public static void open() {
+        Minecraft client = Minecraft.getInstance();
         StoicClient.LOGGER.info("Opening GUI");
-        Minecraft.getInstance().setScreen(
-                new mainGui(Component.empty()));
+        client.schedule(() -> client.setScreen(new mainGui(Component.empty())));
         StoicClient.LOGGER.info("opened screen");
 
-        return Component.literal("Opening GUI");
+
+        //return Component.literal("Opening GUI");
     }
 }

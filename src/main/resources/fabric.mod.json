@@ -16,7 +16,8 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"me.eparon.StoicClient"
+			"me.eparon.StoicClient",
+			"me.eparon.rendering.RenderingTest"
 		]
 
 	},

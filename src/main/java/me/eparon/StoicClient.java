@@ -1,13 +1,17 @@
 package me.eparon;
-
+import net.minecraft.resources.Identifier;
 import me.eparon.commands.openGui;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import org.slf4j.Logger;
+import net.minecraft.client.Minecraft;
 import org.slf4j.LoggerFactory;
-
+import me.eparon.screens.mainGui;
+import net.minecraft.util.thread.TaskScheduler;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import me.eparon.rendering.RenderingTest;
 public class StoicClient implements ModInitializer {
 	public static final String MOD_ID = "stoic-client";
 	public static final String MOD_NAME = "[Stoic] - ";
@@ -22,13 +26,15 @@ public class StoicClient implements ModInitializer {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
-
+		Minecraft client = Minecraft.getInstance();
 		LOGGER.info(MOD_NAME + "Initializing Stoic");
+
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			dispatcher.register(Commands.literal("stoic").executes(context -> {
 				context.getSource().sendSuccess(() -> Component.literal("Called /stoic"), false);
-				context.getSource().sendSuccess(() -> openGui.open(), false);
+				openGui.open();
 				return 1;
+
 			}));
 		});
 

@@ -5,11 +5,15 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 // :::1
 public class mainGui extends Screen {
     // :::1
     // :::2
+    private CustomWidget customWidget = new CustomWidget(40, 80, 120, 20, "a", "a");
+    private CustomWidget customWidget2 = new CustomWidget(40, 120, 120, 20, "b", "b");
+
     public Screen parent;
     public mainGui(Component title, Screen parent) {
         super(title);
@@ -41,19 +45,33 @@ public class mainGui extends Screen {
 
         // Register the button widget.
         this.addRenderableWidget(buttonWidget);
+        this.addRenderableWidget(customWidget2);
+        this.addRenderableWidget(customWidget);
 
         // Add a custom widget to the screen.
         // x, y, width, height
         //CustomWidget customWidget = new CustomWidget(40, 80, 120, 20);
         //this.addRenderableWidget(customWidget);
     }
+    public void handleWidgetPreview(CustomWidget w){
+        if(w.displayHovered && w.removedWidget){
+            this.addRenderableWidget(w.hovered);
+            w.removedWidget = false;
+        }
+        else if(!w.removedWidget && !w.displayHovered){
 
+            this.removeWidget(w.hovered);
+            w.removedWidget = true;
+        }
+    }
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        Minecraft client = Minecraft.getInstance();
         super.render(graphics, mouseX, mouseY, delta);
 //        graphics.fill(10, 10, 110, 60, 0xFF0000FF);
-        StoicClient.LOGGER.info("X: " + mouseX + " Y: " + mouseY + " Delta: " + delta);
-
+//        StoicClient.LOGGER.info("X: " + mouseX + " Y: " + mouseY + " Delta: " + delta);
+        handleWidgetPreview(customWidget);
+        handleWidgetPreview(customWidget2);
         // Minecraft doesn't have a "label" widget, so we'll have to draw our own text.
         // We'll subtract the font height from the Y position to make the text appear above the button.
         // Subtracting an extra 10 pixels will give the text some padding.
