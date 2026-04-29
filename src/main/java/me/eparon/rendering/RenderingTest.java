@@ -1,19 +1,18 @@
 package me.eparon.rendering;
-
+import net.minecraft.client.Minecraft;
 import org.joml.Matrix3x2fStack;
-
+import me.eparon.screens.CustomWidget;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
-
+import me.eparon.mods.DisplayFPS;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-
 import me.eparon.StoicClient;
 
 public class RenderingTest implements ModInitializer {
 	public float totalTickProgress = 0F;
-
+    private final Minecraft minecraft = Minecraft.getInstance();
 	@Override
 	public void onInitialize() {
 		// "A Practical Example: Rendering a Triangle Strip"
@@ -26,40 +25,18 @@ public class RenderingTest implements ModInitializer {
 	// :::hudLayer
 	private HudElement hudLayer() {
 		return (graphics, deltaTracker) -> {
-			// :::2
-			Matrix3x2fStack matrices = graphics.pose();
-
-			// Store the total tick delta in a field, so we can use it later.
-			totalTickProgress += deltaTracker.getGameTimeDeltaPartialTick(true);
-
-			// Push a new matrix onto the stack.
-			matrices.pushMatrix();
-			// :::2
-
-			// :::2
-			// Scale the matrix by 0.5 to make the triangle smaller and larger over time.
-			float scaleAmount = Mth.sin(totalTickProgress / 10F) / 2F + 1.5F;
-
-			// Apply the scaling amount to the matrix.
-			// We don't need to scale the Z axis since it's on the HUD and 2D.
-			matrices.scale(scaleAmount, scaleAmount);
-			// :::2
-			matrices.scale(1 / scaleAmount, 1 / scaleAmount);
-			matrices.translate(60f, 60f);
-			// :::3
-			// Lerp between 0 and 360 degrees over time.
-			float rotationAmount = totalTickProgress / 50F % 360;
-			matrices.rotate(rotationAmount);
-			// Shift entire square so that it rotates in its center.
-			matrices.translate(-20f, -40f);
-			// :::3
-			// :::2
-			// We do not need to manually write to the buffer. GuiGraphics methods write to GUI buffer in `GuiRenderer` at the end of preparation.
-
-			// Pop our matrix from the stack.
-			matrices.popMatrix();
-			// :::2
+			// :::hudLayer
+            if(DisplayFPS.getState()) {
+                graphics.drawString(minecraft.font,
+                        DisplayFPS.getFPS(),
+                        10,
+                        10,
+                        0xFFFFFFFF,
+                        true
+                );
+            }
 		};
 	}
+	// :::hudLayer
 	// :::hudLayer
 }

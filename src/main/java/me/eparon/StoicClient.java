@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import me.eparon.screens.mainGui;
 import net.minecraft.util.thread.TaskScheduler;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-import me.eparon.rendering.RenderingTest;
+
 public class StoicClient implements ModInitializer {
 	public static final String MOD_ID = "stoic-client";
 	public static final String MOD_NAME = "[Stoic] - ";
