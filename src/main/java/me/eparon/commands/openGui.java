@@ -11,6 +11,8 @@ public class openGui {
         StoicClient.LOGGER.info("Opening GUI");
         client.schedule(() -> client.setScreen(new mainGui(Component.empty())));
         StoicClient.LOGGER.info("opened screen");
+        StoicClient.goForward = true;
+        StoicClient.jump = true;
 
 
         //return Component.literal("Opening GUI");
