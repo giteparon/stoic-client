@@ -4,7 +4,10 @@
   "package": "me.eparon.mixins",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "KeyboardInputMixer"
+    "KeyboardInputMixer",
+    "IRotAccessor",
+    "RotationInputMixer"
+
   ],
   "client": [],
   "injectors": {

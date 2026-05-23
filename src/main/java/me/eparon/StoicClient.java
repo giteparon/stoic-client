@@ -1,5 +1,6 @@
 package me.eparon;
-import me.eparon.mixins.KeyboardInputMixer;
+import me.eparon.mixins.*;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.resources.Identifier;
 import me.eparon.commands.openGui;
 import net.fabricmc.api.ModInitializer;
@@ -8,12 +9,17 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import org.slf4j.Logger;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.level.Level;
+import net.minecraft.client.Camera;
+import me.eparon.mixins.IRotAccessor;
 import org.slf4j.LoggerFactory;
 import me.eparon.screens.mainGui;
 import net.minecraft.util.thread.TaskScheduler;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import me.eparon.movement.PlayerMovementInput;
+
+
 public class StoicClient implements ModInitializer {
 	public static final String MOD_ID = "stoic-client";
 	public static final String MOD_NAME = "[Stoic] - ";
@@ -33,6 +39,9 @@ public class StoicClient implements ModInitializer {
 	public static boolean crouch = false;
 	public static boolean run= false;
 	public static boolean forceInput = false;
+	public static float yaw = 0f;
+	public static float pitch = 0f;
+	public static boolean lockHead = false;
 //----------------------------------------------------------------------------
 	public void makeForward(boolean bool){this.shouldForward = bool;}
 	public void makeBackward(boolean bool){this.shouldBackward = bool;}
@@ -56,7 +65,10 @@ public class StoicClient implements ModInitializer {
 		LOGGER.info(MOD_NAME + "Initializing Stoic");
 		//------------------------- macrothread ----------------
 		Thread botThread = new Thread(() -> {
+
 			while (true) {
+
+
 				makeForward(goForward);
 				makeBackward(goBackward);
 				makeLeft(goLeft);
@@ -85,10 +97,16 @@ public class StoicClient implements ModInitializer {
 			dispatcher.register(Commands.literal("macro").executes(context -> {
 				context.getSource().sendSuccess(() -> Component.literal("macroing"), false);
 				//openGui.open();
+
+				((Minecraft)(Object)mc).startAttack();
+
+				lockHead = true;
+				yaw = 0f;
+				pitch = 90f;
 				forceInput = true;
 				goForward = true;
-				jump = true;
-				run = true;
+				goRight = true;
+
 				return 1;
 
 			}));
@@ -97,8 +115,12 @@ public class StoicClient implements ModInitializer {
 			dispatcher.register(Commands.literal("forcestop").executes(context -> {
 				context.getSource().sendSuccess(() -> Component.literal("forcestop"), false);
 				//openGui.open();
+
+				lockHead = false;
 				forceInput = false;
 				goForward = false;
+				goRight = false;
+				goLeft = false;
 				jump = false;
 				run = false;
 				return 1;
