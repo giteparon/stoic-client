@@ -1,5 +1,6 @@
 package me.eparon;
 import me.eparon.mixins.*;
+import me.eparon.mods.*;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.resources.Identifier;
 import me.eparon.commands.openGui;
@@ -11,13 +12,22 @@ import org.slf4j.Logger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
 import net.minecraft.client.Camera;
-import me.eparon.mixins.IRotAccessor;
 import org.slf4j.LoggerFactory;
 import me.eparon.screens.mainGui;
 import net.minecraft.util.thread.TaskScheduler;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import me.eparon.movement.PlayerMovementInput;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.TrapDoorBlock;
+import me.eparon.movement.*;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import java.util.ArrayList;
+import net.minecraft.core.BlockPos;
+import me.eparon.environment.blockUtils;
 
 
 public class StoicClient implements ModInitializer {
@@ -42,6 +52,7 @@ public class StoicClient implements ModInitializer {
 	public static float yaw = 0f;
 	public static float pitch = 0f;
 	public static boolean lockHead = false;
+	public static boolean forcestop = false;
 //----------------------------------------------------------------------------
 	public void makeForward(boolean bool){this.shouldForward = bool;}
 	public void makeBackward(boolean bool){this.shouldBackward = bool;}
@@ -101,8 +112,7 @@ public class StoicClient implements ModInitializer {
 				((Minecraft)(Object)mc).startAttack();
 
 				lockHead = true;
-				yaw = 0f;
-				pitch = 90f;
+
 				forceInput = true;
 				goForward = true;
 				goRight = true;
@@ -115,6 +125,12 @@ public class StoicClient implements ModInitializer {
 			dispatcher.register(Commands.literal("forcestop").executes(context -> {
 				context.getSource().sendSuccess(() -> Component.literal("forcestop"), false);
 				//openGui.open();
+				ArrayList<Float> waypoints = new ArrayList<Float>();
+				waypoints.add(0f);
+				waypoints.add(100f);
+				waypoints.add(0f);
+				forcestop = true;
+				pathFinding.waypointsArray.add(waypoints);
 
 				lockHead = false;
 				forceInput = false;
@@ -127,8 +143,62 @@ public class StoicClient implements ModInitializer {
 
 			}));
 		});
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			dispatcher.register(Commands.literal("stoic").executes(context -> {
+				context.getSource().sendSuccess(() -> Component.literal("opening stoic gui"), false);
+				openGui.open();
+				return 1;
 
+			}));
+		});
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			dispatcher.register(Commands.literal("srotatepreview").executes(context -> {
+				context.getSource().sendSuccess(() -> Component.literal("rotating"), false);
+				Thread lookThread = new Thread(() -> {
+					forcestop = false;
+					double[][] a = {{8.5, -58.5, 4.5},{10.5, -59.5, 8.5},{7.5, -58.5, 10.5},{5.5, -57.5, 7.5}};
+					int counter = 0;
+					int ncounter = 0;
+					while(true && !forcestop) {
+						if(!RotUtils.macroRotating){
+							((Minecraft)(Object)mc).startAttack();
 
+							RotUtils.smoothLookAt(a[counter][0], a[counter][1], a[counter][2]);
+							ncounter = (int)(Math.random() * 4);
+							while(ncounter == counter){
+								ncounter = (int)(Math.random() * 4);
+							}
+							counter = ncounter;
+
+						}
+
+						sleepMs(1);
+
+					}
+
+				});
+
+				lookThread.setName("(Rotating)");
+				lookThread.start();
+
+				return 1;
+
+			}));
+		});
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			dispatcher.register(Commands.literal("findBlock")
+					.then(Commands.argument("value", StringArgumentType.string())
+							.executes(StoicClient::findBlock)));
+		});
+
+//		AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> {
+//			BlockState state = level.getBlockState(pos);
+//			if (!player.isSpectator() && AutoStasis.waitingForHitTrapdoor && level.getBlock() instanceof TrapDoorBlock) {
+//				AutoStasis.stasisBlockPos = pos;
+//			}
+//
+//			return InteractionResult.PASS;
+//		});
 
 	}
 	public static void sleepMs(long ms) {
@@ -138,6 +208,16 @@ public class StoicClient implements ModInitializer {
 			Thread.currentThread().interrupt();
 		}
 	}
+	private static int findBlock(CommandContext<CommandSourceStack> context) {
+		String value = StringArgumentType.getString(context, "value");
+		BlockPos pos = blockUtils.findBlockInRadiusByString(value, 6);
+		String response = "X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ();
+		RotUtils.smoothLookAt(pos.getX() + 0.5, pos.getY()+ 0.5, pos.getZ()+ 0.5);
+		context.getSource().sendSuccess(() -> Component.literal(response), false);
+
+		return 1;
+	}
+
 
 
 }

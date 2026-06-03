@@ -6,7 +6,9 @@
   "mixins": [
     "KeyboardInputMixer",
     "IRotAccessor",
-    "RotationInputMixer"
+    "RotationInputMixer",
+    "MouseHandlerMixer",
+    "GameRendererMixin"
 
   ],
   "client": [],

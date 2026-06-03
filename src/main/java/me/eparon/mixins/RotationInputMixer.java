@@ -33,7 +33,7 @@ public abstract class RotationInputMixer {
         float yaw = StoicClient.yaw;
         float pitch = StoicClient.pitch;
         if(StoicClient.lockHead) {
-            ((IRotAccessor) (Object) this).rotateTo(0f, 0f);
+            //((IRotAccessor) (Object) this).rotateTo(yaw, pitch);
         }
     }
 }

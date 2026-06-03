@@ -21,7 +21,8 @@
 	"entrypoints": {
 		"main": [
 			"me.eparon.StoicClient",
-			"me.eparon.rendering.RenderingTest"
+			"me.eparon.rendering.RenderingTest",
+			"me.eparon.rendering.RenderWaypoints"
 
 		]
 
