@@ -8,7 +8,8 @@
     "IRotAccessor",
     "RotationInputMixer",
     "MouseHandlerMixer",
-    "GameRendererMixin"
+    "GameRendererMixin",
+    "ClickMixer"
 
   ],
   "client": [],

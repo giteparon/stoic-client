@@ -22,4 +22,8 @@ public class Position {
     public BlockPos getPosition() {
         return new BlockPos(this.x, this.y, this.z);
     }
+    @Override
+    public String toString() {
+        return "Position [x=" + this.x + ", y=" + this.y + ", z=" + this.z + "]";
+    }
 }

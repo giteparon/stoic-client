@@ -16,7 +16,4 @@ import net.minecraft.world.entity.Entity;
 public interface IRotAccessor {
     @Invoker("setRotation")
     void rotateTo(float pitch, float yaw);
-
-
-
 }

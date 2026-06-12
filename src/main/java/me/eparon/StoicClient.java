@@ -27,6 +27,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import java.util.ArrayList;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
 import me.eparon.environment.blockUtils;
 
 
@@ -53,6 +54,8 @@ public class StoicClient implements ModInitializer {
 	public static float pitch = 0f;
 	public static boolean lockHead = false;
 	public static boolean forcestop = false;
+	public static boolean holdLeftClick = false;
+	public static boolean firstClick = false;
 //----------------------------------------------------------------------------
 	public void makeForward(boolean bool){this.shouldForward = bool;}
 	public void makeBackward(boolean bool){this.shouldBackward = bool;}
@@ -105,22 +108,17 @@ public class StoicClient implements ModInitializer {
 			}));
 		});
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-			dispatcher.register(Commands.literal("macro").executes(context -> {
-				context.getSource().sendSuccess(() -> Component.literal("macroing"), false);
-				//openGui.open();
+			dispatcher.register(Commands.literal("hold").executes(context -> {
+				context.getSource().sendSuccess(() -> Component.literal("holding"), false);
+				this.holdLeftClick = true;
+				this.firstClick = true;
 
-				((Minecraft)(Object)mc).startAttack();
-
-				lockHead = true;
-
-				forceInput = true;
-				goForward = true;
-				goRight = true;
 
 				return 1;
 
 			}));
 		});
+
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			dispatcher.register(Commands.literal("forcestop").executes(context -> {
 				context.getSource().sendSuccess(() -> Component.literal("forcestop"), false);
@@ -161,7 +159,7 @@ public class StoicClient implements ModInitializer {
 					int ncounter = 0;
 					while(true && !forcestop) {
 						if(!RotUtils.macroRotating){
-							((Minecraft)(Object)mc).startAttack();
+							mc.startAttack();
 
 							RotUtils.smoothLookAt(a[counter][0], a[counter][1], a[counter][2]);
 							ncounter = (int)(Math.random() * 4);
@@ -210,7 +208,7 @@ public class StoicClient implements ModInitializer {
 	}
 	private static int findBlock(CommandContext<CommandSourceStack> context) {
 		String value = StringArgumentType.getString(context, "value");
-		BlockPos pos = blockUtils.findBlockInRadiusByString(value, 6);
+		BlockPos pos = blockUtils.findBlockInRadiusByString(value, 4);
 		String response = "X: " + pos.getX() + " Y: " + pos.getY() + " Z: " + pos.getZ();
 		RotUtils.smoothLookAt(pos.getX() + 0.5, pos.getY()+ 0.5, pos.getZ()+ 0.5);
 		context.getSource().sendSuccess(() -> Component.literal(response), false);

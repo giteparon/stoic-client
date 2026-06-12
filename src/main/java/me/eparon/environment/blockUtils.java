@@ -108,4 +108,10 @@ public class blockUtils {
         }
         return false;
     }
+    public static Block getBlock(Position pos){
+        Level level = Minecraft.getInstance().level;
+        BlockPos targetPos = new BlockPos(pos.x , pos.y, pos.z);
+        BlockState state = level.getBlockState(targetPos);
+        return state.getBlock();
+    }
 }
